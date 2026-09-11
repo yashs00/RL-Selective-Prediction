@@ -48,7 +48,7 @@ import pandas as pd
 
 from ..aggregators.a0_rank import RankAverageAggregator
 from ..aggregators.a1_stacking import LightGBMStackingAggregator, LogRegStackingAggregator
-from ..aggregators.a2_coverage_loss import AdaptiveGatingAggregator, MLPAggregator, RLBanditAggregator
+from ..aggregators.a2_coverage_loss import AdaptiveGatingAggregator, LinearRLBanditAggregator, MLPAggregator, RLBanditAggregator
 from ..conformal.risk_control import coverage_at_guaranteed_risk_table
 from ..data import splits as split_utils
 from ..data.loaders import Dataset, load as load_dataset
@@ -298,7 +298,14 @@ def run_experiment(
         "A1_logreg": lambda: LogRegStackingAggregator(seed=seed),
         "A1_lightgbm": lambda: LightGBMStackingAggregator(seed=seed),
         "A2_mlp_bce": lambda: MLPAggregator(loss="bce", seed=seed),
-        "A2_rl_bandit": lambda: RLBanditAggregator(seed=seed),
+        "A2_rl_bandit": lambda: RLBanditAggregator(seed=seed, penalty_c=1.5),
+        # --- RL penalty sweep (sensitivity analysis) ---
+        "A2_rl_c0.5": lambda: RLBanditAggregator(seed=seed, penalty_c=0.5),
+        "A2_rl_c1.0": lambda: RLBanditAggregator(seed=seed, penalty_c=1.0),
+        "A2_rl_c3.0": lambda: RLBanditAggregator(seed=seed, penalty_c=3.0),
+        "A2_rl_c10.0": lambda: RLBanditAggregator(seed=seed, penalty_c=10.0),
+        # --- Linear RL ablation (Occam's razor) ---
+        "A2_rl_linear": lambda: LinearRLBanditAggregator(seed=seed, penalty_c=1.5),
         "A2_mlp_loss1": lambda: MLPAggregator(loss="loss1", seed=seed),
         "A2_mlp_loss2": lambda: MLPAggregator(loss="loss2", seed=seed),
         "A2_mlp_loss3": lambda: MLPAggregator(loss="loss3", seed=seed),

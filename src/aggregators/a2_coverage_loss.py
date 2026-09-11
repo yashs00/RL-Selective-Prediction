@@ -140,7 +140,7 @@ class _BaseTorchAggregator:
             if self.loss_name == "bce":
                 loss = bce_loss(logit, incorrect)
             elif self.loss_name == "rl_bandit":
-                loss = expected_bandit_reward_loss(logit, incorrect, penalty_c=10.0)
+                loss = expected_bandit_reward_loss(logit, incorrect, penalty_c=self.penalty_c)
             elif self.loss_name == "loss1":
                 # Losses 1/2 gate on the RAW logit, with tau a quantile of
                 # the current batch's logits (see losses.quantile_tau) --
@@ -251,9 +251,43 @@ class AdaptiveGatingAggregator(_BaseTorchAggregator):
 class RLBanditAggregator(MLPAggregator):
     """Contextual Bandit Policy network for Selective Prediction.
     Outputs the log-odds of abstention, trained directly on the expected reward
-    of taking a hard discrete action (Abstain or Predict)."""
-    
-    def __init__(self, **kwargs):
+    of taking a hard discrete action (Abstain or Predict).
+
+    `penalty_c` controls the cost of a wrong prediction relative to the
+    reward for a correct one.  The original default of 10.0 was far too
+    aggressive: on datasets with distribution shift (e.g. Electricity) the
+    agent collapsed to "always abstain" because the expected penalty
+    dominated any possible reward.  1.5 lets the agent explore while still
+    being risk-averse."""
+
+    def __init__(self, penalty_c: float = 1.5, **kwargs):
         kwargs["loss"] = "rl_bandit"
         super().__init__(**kwargs)
+        self.penalty_c = penalty_c
         self.name = "A2_rl_bandit"
+
+
+class LinearRLBanditAggregator(_BaseTorchAggregator):
+    """Linear Contextual Bandit for Selective Prediction.
+
+    Replaces the deep MLP backbone with a single linear layer
+    (no hidden layers, no ReLU, no dropout).  This tests whether
+    the RL Expected-Reward *loss formulation* alone is enough to
+    beat the MSP baseline, even without deep network capacity.
+
+    Linear models are also far more robust to covariate shift
+    because they cannot memorise complex decision surfaces that
+    break under distribution change."""
+
+    def __init__(self, penalty_c: float = 1.5, **kwargs):
+        kwargs["loss"] = "rl_bandit"
+        kwargs.setdefault("dropout", 0.0)
+        super().__init__(**kwargs)
+        self.penalty_c = penalty_c
+        self.name = "A2_rl_linear"
+
+    def _build_net(self, m_in: int) -> nn.Module:
+        return nn.Linear(m_in, 1)
+
+    def _score_logit(self, net_out: torch.Tensor, U_t: torch.Tensor) -> torch.Tensor:
+        return net_out.squeeze(-1)
