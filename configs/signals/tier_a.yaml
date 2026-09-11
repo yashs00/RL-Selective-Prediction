@@ -1,0 +1,5 @@
+# Tier A only -- the cheap ablation configuration (§3.1, §11 mitigation
+# for "Tier B/C signals too slow to be practical": "offer a Tier-A-only
+# variant as the cheap configuration").
+tiers: ["A"]
+use_ensemble: false

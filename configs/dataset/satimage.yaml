@@ -1,0 +1,5 @@
+# satimage -- multiclass (K>=3) dataset added to test whether breaking the binary
+# Tier-A rank degeneracy lets aggregation beat MSP. See the multiclass block
+# in src/data/loaders.py:REGISTRY for why these were chosen. No subgroup
+# column (so no RQ4 rows) and not temporal (so no RQ2 shift claim).
+name: satimage

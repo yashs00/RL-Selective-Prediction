@@ -1,0 +1,10 @@
+name: lightgbm
+# Hyperparameters are not currently threaded through Hydra into
+# LightGBMWrapper (src/experiment/runner.py's _fit_model only passes
+# `seed`) -- this file is name-only for now. The subsampling defaults that
+# make `seed` actually vary the trained model (bagging_fraction=0.8,
+# bagging_freq=1, feature_fraction=0.8) live directly in
+# `src/models/lightgbm_model.py`'s `LightGBMWrapper._RANDOMNESS_DEFAULTS`.
+# If this config group grows real hyperparameter overrides later, wire
+# them through as `**lgb_kwargs` and keep them consistent with that
+# default there.

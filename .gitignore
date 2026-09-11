@@ -1,0 +1,14 @@
+# Ignore all markdown files
+*.md
+
+# Except README.md
+!README.md
+
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+
+# Ignore large output data/zips
+*.parquet
+*.zip
+.DS_Store

@@ -1,0 +1,7 @@
+n_cv_folds: 5
+n_seeds: 1 # §7 calls for 10; see PROJECT_STATUS.md for the scale-out plan
+conformal_delta: 0.1
+# Write per-instance test scores to results/raw/ (gitignored) so
+# scripts/make_bootstrap_table.py can run §7's paired bootstrap over test
+# instances. Set false to skip; the summary parquet is unaffected either way.
+cache_raw_scores: true

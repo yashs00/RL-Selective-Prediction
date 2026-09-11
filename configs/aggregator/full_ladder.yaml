@@ -1,0 +1,8 @@
+# The runner (src/experiment/runner.py) always evaluates the full §7
+# baseline ladder (random, MSP, entropy, margin, energy, ..., SelectiveNet-
+# style aggregators A0/A1/A2, oracle) in one call -- there is currently no
+# per-aggregator config knob to prune that list. This file is a placeholder
+# so `configs/config.yaml`'s defaults list resolves; extend
+# `src/experiment/runner.py:aggregator_factories` and add a matching
+# `subset` key here if/when you need to run a smaller ladder for speed.
+name: full_ladder

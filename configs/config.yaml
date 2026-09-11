@@ -1,0 +1,13 @@
+# Hydra top-level config (§8: "config management -- do not hand-roll
+# argparse"). Compose an experiment with e.g.:
+#   python scripts/run_all.py dataset=adult model=lightgbm signals=tier_a_c
+defaults:
+  - dataset: adult
+  - model: lightgbm
+  - signals: tier_a_c
+  - aggregator: full_ladder
+  - experiment: default
+  - _self_
+
+seed: 0
+output_dir: results

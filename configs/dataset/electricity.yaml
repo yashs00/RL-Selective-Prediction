@@ -1,0 +1,4 @@
+name: electricity
+subgroup_col: null
+# Temporal shift dataset per §4 -- Dataset.is_temporal=True forces the
+# 4-way split in src/data/splits.py to split by row order, never randomly.

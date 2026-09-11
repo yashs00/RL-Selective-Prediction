@@ -1,0 +1,5 @@
+# Default running configuration used for the results in this repo so far
+# (§9 weeks 2-4): Tier A + Tier C, no ensemble (Tier B is opt-in -- see
+# tier_a_b_c.yaml -- because it multiplies training cost by n_ensemble_members).
+tiers: ["A", "C"]
+use_ensemble: false

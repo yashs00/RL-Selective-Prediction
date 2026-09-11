@@ -1,0 +1,6 @@
+# Full signal bank including Tier B ensemble disagreement (§3.1). Slower:
+# trains n_ensemble_members extra base models on top of the cross-fitting
+# already required for Tier A/C.
+tiers: ["A", "B", "C"]
+use_ensemble: true
+n_ensemble_members: 5

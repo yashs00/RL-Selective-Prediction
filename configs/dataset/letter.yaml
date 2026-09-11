@@ -1,0 +1,6 @@
+# letter -- multiclass (K>=3) dataset added to test whether breaking the binary
+# Tier-A rank degeneracy lets aggregation beat MSP. See the multiclass block
+# in src/data/loaders.py:REGISTRY for the selection criteria (notably the
+# test-error-count screen). No subgroup column (so no RQ4 rows) and not
+# temporal (so it makes no RQ2 shift claim).
+name: letter
