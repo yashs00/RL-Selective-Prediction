@@ -208,6 +208,38 @@ REGISTRY = {
         target_column="class",
         subgroup_cols=[],
     ),
+    # --- Extra Datasets for Friedman Test Statistical Power ---
+    # Added to guarantee >= 12 datasets for the Friedman test rank analysis
+    "phoneme": dict(
+        dataset_id=1489,
+        target_column="Class",
+        subgroup_cols=[],
+    ),
+    "bank_marketing": dict(
+        dataset_id=1461,
+        target_column="Class",
+        subgroup_cols=[],
+    ),
+    "nomao": dict(
+        dataset_id=1486,
+        target_column="Class",
+        subgroup_cols=[],
+    ),
+    "kr_vs_kp": dict(
+        dataset_id=3,
+        target_column="class",
+        subgroup_cols=[],
+    ),
+    "eeg_eye_state": dict(
+        dataset_id=1471,
+        target_column="Class",
+        subgroup_cols=[],
+    ),
+    "magic_telescope": dict(
+        dataset_id=1120,
+        target_column="class",
+        subgroup_cols=[],
+    ),
     # Diabetes-130 (Strack et al. 2014) was registered and run as the plan's
     # second temporal-shift dataset (§4), but was dropped by explicit
     # decision: too many incomplete fields for the result to be trusted
