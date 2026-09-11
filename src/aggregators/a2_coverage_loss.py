@@ -254,13 +254,11 @@ class RLBanditAggregator(MLPAggregator):
     of taking a hard discrete action (Abstain or Predict).
 
     `penalty_c` controls the cost of a wrong prediction relative to the
-    reward for a correct one.  The original default of 10.0 was far too
-    aggressive: on datasets with distribution shift (e.g. Electricity) the
-    agent collapsed to "always abstain" because the expected penalty
-    dominated any possible reward.  1.5 lets the agent explore while still
-    being risk-averse."""
+    reward for a correct one. Sweeps show c=10.0 (highly risk averse) is
+    optimal on stable datasets like wine_quality_white, while lower
+    penalties may be needed under distribution shift."""
 
-    def __init__(self, penalty_c: float = 1.5, **kwargs):
+    def __init__(self, penalty_c: float = 10.0, **kwargs):
         kwargs["loss"] = "rl_bandit"
         super().__init__(**kwargs)
         self.penalty_c = penalty_c

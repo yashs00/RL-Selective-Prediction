@@ -298,7 +298,7 @@ def run_experiment(
         "A1_logreg": lambda: LogRegStackingAggregator(seed=seed),
         "A1_lightgbm": lambda: LightGBMStackingAggregator(seed=seed),
         "A2_mlp_bce": lambda: MLPAggregator(loss="bce", seed=seed),
-        "A2_rl_bandit": lambda: RLBanditAggregator(seed=seed, penalty_c=1.5),
+        "A2_rl_bandit": lambda: RLBanditAggregator(seed=seed, penalty_c=10.0),
         # --- RL penalty sweep (sensitivity analysis) ---
         "A2_rl_c0.5": lambda: RLBanditAggregator(seed=seed, penalty_c=0.5),
         "A2_rl_c1.0": lambda: RLBanditAggregator(seed=seed, penalty_c=1.0),
