@@ -12,6 +12,5 @@ __pycache__/
 *.parquet
 *.zip
 .DS_Store
-paper/
 results/raw/
 scratch/
