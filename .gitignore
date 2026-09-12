@@ -11,5 +11,3 @@ __pycache__/
 # Ignore large output data/zips
 *.parquet
 *.zip
-.DS_Store
-paper/
