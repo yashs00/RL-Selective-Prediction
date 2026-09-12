@@ -190,8 +190,10 @@ def pairwise_ranking_loss(
         # model) -- no valid pairs, contribute zero loss rather than NaN.
         return s_logit.new_zeros(())
     kwargs = {"generator": generator} if generator is not None else {}
-    ci = correct_idx[torch.randint(0, len(correct_idx), (n_pairs,), **kwargs)]
-    ii = incorrect_idx[torch.randint(0, len(incorrect_idx), (n_pairs,), **kwargs)]
+    rand_c = torch.randint(0, len(correct_idx), (n_pairs,), device=correct_idx.device, **kwargs)
+    rand_i = torch.randint(0, len(incorrect_idx), (n_pairs,), device=incorrect_idx.device, **kwargs)
+    ci = correct_idx[rand_c]
+    ii = incorrect_idx[rand_i]
     margin = s_logit[ii] - s_logit[ci]  # want > 0 (incorrect = higher risk)
     return F.softplus(-margin).mean()
 

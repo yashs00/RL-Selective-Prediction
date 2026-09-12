@@ -69,6 +69,7 @@ class _BaseTorchAggregator:
         dropout: float = 0.1,
         grad_clip: float = 1.0,
         seed: int = 0,
+        device: str | torch.device | None = None,
     ):
         assert loss in ("bce", "loss1", "loss2", "loss3", "rl_bandit")
         self.loss_name = loss
@@ -85,6 +86,10 @@ class _BaseTorchAggregator:
         self.scaler = _Standardizer()
         self.net: nn.Module | None = None
         self.bias: nn.Parameter | None = None  # adaptive-gating output bias
+        if device is None:
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        else:
+            self.device = torch.device(device)
         # loss1/loss2's threshold tau used to live here as a learned
         # nn.Parameter. It is now derived fresh each step from the current
         # batch's logits (see losses.quantile_tau) -- a quantile-based
@@ -110,17 +115,24 @@ class _BaseTorchAggregator:
 
     def fit(self, U_meta: np.ndarray, correct_meta: np.ndarray) -> "_BaseTorchAggregator":
         torch.manual_seed(self.seed)
-        gen = torch.Generator().manual_seed(self.seed)
+        if self.device.type == "cuda":
+            torch.cuda.manual_seed_all(self.seed)
+            gen = torch.Generator(device="cuda").manual_seed(self.seed)
+        else:
+            gen = torch.Generator().manual_seed(self.seed)
 
         Un = self.scaler.fit(U_meta).transform(U_meta)
-        U_t = torch.tensor(Un, dtype=torch.float32)
-        incorrect = torch.tensor(1 - correct_meta.astype(int), dtype=torch.float32)
+        U_t = torch.tensor(Un, dtype=torch.float32, device=self.device)
+        incorrect = torch.tensor(1 - correct_meta.astype(int), dtype=torch.float32, device=self.device)
 
-        self.net = self._build_net(Un.shape[1])
+        self.net = self._build_net(Un.shape[1]).to(self.device)
         params = list(self.net.parameters())
         # Subclass-owned extra parameters, initialised from the meta-set
         # base error rate (see AdaptiveGatingAggregator._extra_params).
-        params += self._extra_params(float(incorrect.mean()))
+        extra = self._extra_params(float(incorrect.mean().item()))
+        for p in extra:
+            p.data = p.data.to(self.device)
+        params += extra
 
         opt = torch.optim.Adam(params, lr=self.lr, weight_decay=self.weight_decay)
         # Cosine annealing from `lr` down to `lr_min`. Training was
@@ -170,12 +182,12 @@ class _BaseTorchAggregator:
 
     def score(self, U: np.ndarray) -> np.ndarray:
         Un = self.scaler.transform(U)
-        U_t = torch.tensor(Un, dtype=torch.float32)
+        U_t = torch.tensor(Un, dtype=torch.float32, device=self.device)
         self.net.eval()  # dropout must be off at scoring time
         with torch.no_grad():
             logit = self._score_logit(self.net(U_t), U_t)
             s = torch.sigmoid(logit)
-        return s.numpy()
+        return s.cpu().numpy()
 
 
 class MLPAggregator(_BaseTorchAggregator):
@@ -241,11 +253,11 @@ class AdaptiveGatingAggregator(_BaseTorchAggregator):
         """Learned per-signal gating weights w(x) for interpretability
         (§3.4's headline figure)."""
         Un = self.scaler.transform(U)
-        U_t = torch.tensor(Un, dtype=torch.float32)
+        U_t = torch.tensor(Un, dtype=torch.float32, device=self.device)
         with torch.no_grad():
             logits = self.net(U_t)
             w = torch.softmax(logits, dim=1)
-        return w.numpy()
+        return w.cpu().numpy()
 
 
 class RLBanditAggregator(MLPAggregator):
