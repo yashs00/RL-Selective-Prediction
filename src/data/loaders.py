@@ -92,6 +92,16 @@ def fetch_openml_dataset(
             f"(parquet caching does not preserve DataFrame.attrs)."
         )
 
+    if target_column not in df.columns:
+        # Graceful fallback: match case-insensitively or stripping trailing colons/spaces
+        candidates = [
+            c for c in df.columns
+            if c.strip().lower() == str(target_column).strip().lower()
+            or c.strip(":").strip().lower() == str(target_column).strip(":").strip().lower()
+        ]
+        if candidates:
+            target_column = candidates[0]
+
     y_raw = df[target_column]
     X = df.drop(columns=[target_column])
 
@@ -237,7 +247,7 @@ REGISTRY = {
     ),
     "magic_telescope": dict(
         dataset_id=1120,
-        target_column="class",
+        target_column="class:",
         subgroup_cols=[],
     ),
     # Diabetes-130 (Strack et al. 2014) was registered and run as the plan's
