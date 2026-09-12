@@ -134,7 +134,13 @@ class _BaseTorchAggregator:
             p.data = p.data.to(self.device)
         params += extra
 
-        opt = torch.optim.Adam(params, lr=self.lr, weight_decay=self.weight_decay)
+        # Meta-overfitting guard for small meta splits (e.g. German Credit N_meta=150):
+        # apply stronger weight decay for risk-reward / likelihood losses when sample count is low (<1000).
+        if self.loss_name in ("bce", "rl_bandit") and Un.shape[0] < 1000:
+            wd = max(self.weight_decay, 1e-2)
+        else:
+            wd = self.weight_decay
+        opt = torch.optim.Adam(params, lr=self.lr, weight_decay=wd)
         # Cosine annealing from `lr` down to `lr_min`. Training was
         # previously a fixed lr=1e-2 for 300 full-batch steps with no
         # schedule and no stopping rule, which is large enough to keep
@@ -142,6 +148,10 @@ class _BaseTorchAggregator:
         sched = torch.optim.lr_scheduler.CosineAnnealingLR(
             opt, T_max=self.epochs, eta_min=self.lr_min
         )
+
+        best_loss = float("inf")
+        best_state: dict | None = None
+        best_bias: torch.Tensor | None = None
 
         self.net.train()
         for _ in range(self.epochs):
@@ -170,9 +180,6 @@ class _BaseTorchAggregator:
                 loss = pairwise_ranking_loss(logit, incorrect, generator=gen)
 
             loss.backward()
-            # Loss 1 divides by `sum(g)`, which can get small when the gate
-            # closes, so its gradient occasionally spikes; clip before the
-            # step rather than letting one batch throw the weights.
             torch.nn.utils.clip_grad_norm_(params, max_norm=self.grad_clip)
             opt.step()
             sched.step()
@@ -289,7 +296,7 @@ class LinearRLBanditAggregator(_BaseTorchAggregator):
     because they cannot memorise complex decision surfaces that
     break under distribution change."""
 
-    def __init__(self, penalty_c: float = 1.5, **kwargs):
+    def __init__(self, penalty_c: float = 10.0, **kwargs):
         kwargs["loss"] = "rl_bandit"
         kwargs.setdefault("dropout", 0.0)
         super().__init__(**kwargs)

@@ -41,20 +41,32 @@ class LogRegStackingAggregator:
 
     name = "A1_logreg"
 
-    def __init__(self, C: float = 1.0, seed: int = 0):
+    def __init__(
+        self,
+        C: float = 1.0,
+        penalty: str = "elasticnet",
+        l1_ratio: float = 0.5,
+        solver: str = "saga",
+        seed: int = 0,
+    ):
         self.C = C
+        self.penalty = penalty
+        self.l1_ratio = l1_ratio
+        self.solver = solver
         self.seed = seed
         self.model: Pipeline | None = None
 
     def fit(self, U_meta: np.ndarray, correct_meta: np.ndarray) -> "LogRegStackingAggregator":
         incorrect = 1 - correct_meta.astype(int)
+        kwargs = dict(C=self.C, max_iter=2000, random_state=self.seed)
+        if self.penalty == "elasticnet":
+            kwargs.update(penalty="elasticnet", solver=self.solver, l1_ratio=self.l1_ratio)
+        else:
+            kwargs.update(penalty=self.penalty)
         self.model = Pipeline(
             [
                 ("scale", StandardScaler()),
-                (
-                    "clf",
-                    LogisticRegression(C=self.C, max_iter=2000, random_state=self.seed),
-                ),
+                ("clf", LogisticRegression(**kwargs)),
             ]
         )
         self.model.fit(U_meta, incorrect)

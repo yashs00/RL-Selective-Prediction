@@ -305,7 +305,7 @@ def run_experiment(
         "A2_rl_c3.0": lambda: RLBanditAggregator(seed=seed, penalty_c=3.0),
         "A2_rl_c10.0": lambda: RLBanditAggregator(seed=seed, penalty_c=10.0),
         # --- Linear RL ablation (Occam's razor) ---
-        "A2_rl_linear": lambda: LinearRLBanditAggregator(seed=seed, penalty_c=1.5),
+        "A2_rl_linear": lambda: LinearRLBanditAggregator(seed=seed, penalty_c=10.0),
         "A2_mlp_loss1": lambda: MLPAggregator(loss="loss1", seed=seed),
         "A2_mlp_loss2": lambda: MLPAggregator(loss="loss2", seed=seed),
         "A2_mlp_loss3": lambda: MLPAggregator(loss="loss3", seed=seed),

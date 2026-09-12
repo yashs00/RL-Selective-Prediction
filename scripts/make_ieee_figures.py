@@ -55,9 +55,11 @@ plt.rcParams.update({
 METHOD_PALETTE = {
     "signal_msp": ("#1b9e77", "-", "MSP (Baseline)"),
     "signal_temp_msp": ("#66a61e", "--", "Temp-Scaled MSP"),
-    "A1_logreg": ("#7570b3", "-.", "A1 Stacking (LogReg)"),
-    "A2_mlp_loss3": ("#d95f02", "-", "A2 MLP (Ranking Loss)"),
+    "A1_logreg": ("#7570b3", "-.", "A1 Stacking (ElasticNet)"),
+    "A2_mlp_loss2": ("#386cb0", "--", "A2 MLP (AURC Loss 2)"),
+    "A2_mlp_loss3": ("#d95f02", "-", "A2 MLP (Ranking Loss 3)"),
     "A2_rl_bandit": ("#e7298a", "-", "A2 RL Bandit (Expected Reward)"),
+    "A2_rl_linear": ("#a6761d", "-.", "A2 Linear RL Bandit"),
     "A2_adaptive_loss3": ("#e6ab02", ":", "A2 Adaptive Gating"),
     "oracle": ("#222222", ":", "Oracle (Upper Bound)"),
     "random": ("#888888", "--", "Random (Lower Bound)"),
