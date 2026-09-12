@@ -50,7 +50,7 @@ def main(cfg: DictConfig) -> None:
     all_dfs = []
     for seed in range(cfg.experiment.n_seeds):
         print(f"[run_all] dataset={cfg.dataset.name} model={cfg.model.name} "
-              f"tiers={cfg.signals.tiers} seed={seed}")
+              f"tiers={cfg.signals.tiers} seed={seed}", flush=True)
         df = run_experiment(
             dataset_name=cfg.dataset.name,
             model_name=cfg.model.name,
@@ -99,7 +99,7 @@ def main(cfg: DictConfig) -> None:
         combined = new_results
 
     combined.to_parquet(RESULTS_PATH)
-    print(f"[run_all] wrote {len(combined)} rows -> {RESULTS_PATH}")
+    print(f"[run_all] wrote {len(combined)} rows -> {RESULTS_PATH}", flush=True)
 
 
 if __name__ == "__main__":

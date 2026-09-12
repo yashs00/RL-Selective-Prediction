@@ -50,7 +50,7 @@ class _TrainIndexedSignal(Signal):
         # small dataset or a small cross-fitting fold would otherwise raise.
         # Recorded on the instance so `_neighbors` queries the same k.
         self.k = int(min(self.k, len(feats)))
-        self.nn = NearestNeighbors(n_neighbors=self.k).fit(feats)
+        self.nn = NearestNeighbors(n_neighbors=self.k, n_jobs=-1).fit(feats)
         self.y_train = np.asarray(y_train)
         self.n_classes = int(self.y_train.max()) + 1
         return self
@@ -117,7 +117,7 @@ class TrustScoreSignal(_TrainIndexedSignal):
         self.y_train = np.asarray(y_train)
         self.n_classes = int(self.y_train.max()) + 1
         self.per_class_nn = {
-            c: NearestNeighbors(n_neighbors=1).fit(feats[self.y_train == c])
+            c: NearestNeighbors(n_neighbors=1, n_jobs=-1).fit(feats[self.y_train == c])
             for c in range(self.n_classes)
             if (self.y_train == c).sum() > 0
         }
