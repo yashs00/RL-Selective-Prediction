@@ -240,6 +240,11 @@ REGISTRY = {
         target_column="class",
         subgroup_cols=[],
     ),
+    "cifar10_resnet": dict(
+        dataset_id=99999,
+        target_column="target",
+        subgroup_cols=[],
+    ),
     # Diabetes-130 (Strack et al. 2014) was registered and run as the plan's
     # second temporal-shift dataset (§4), but was dropped by explicit
     # decision: too many incomplete fields for the result to be trusted
