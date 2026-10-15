@@ -1,0 +1,6 @@
+# waveform-5000 -- multiclass (K=3) dataset added to broaden the multiclass
+# benchmark beyond wine_quality_white/satimage/letter. Screened on test-set
+# error count (116 errors, 84.5% base accuracy) -- see the multiclass block
+# in src/data/loaders.py:REGISTRY. No subgroup column (so no RQ4 rows) and
+# not temporal (so no RQ2 shift claim).
+name: waveform_5000

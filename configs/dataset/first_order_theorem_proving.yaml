@@ -1,0 +1,7 @@
+# first-order-theorem-proving -- multiclass (K=6) dataset added to broaden
+# the multiclass benchmark beyond wine_quality_white/satimage/letter.
+# Screened on test-set error count (349 errors, 62.0% base accuracy -- more
+# errors than wine_quality_white's 232) -- see the multiclass block in
+# src/data/loaders.py:REGISTRY. No subgroup column (so no RQ4 rows) and not
+# temporal (so no RQ2 shift claim).
+name: first_order_theorem_proving

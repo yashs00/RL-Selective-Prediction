@@ -218,6 +218,34 @@ REGISTRY = {
         target_column="class",
         subgroup_cols=[],
     ),
+    # --- Additional multiclass datasets (added to stop the multiclass
+    # aggregation result from resting on wine_quality_white alone) ---
+    #
+    # Screened the same way as the three above, against the same bar: a
+    # risk-coverage curve is built entirely out of D_test's *errors*, so a
+    # dataset the base model nails is a curve made of noise regardless of N.
+    # A first pass over classic small UCI multiclass sets (vehicle: 28
+    # errors, vowel: 7, isolet: 38, mfeat-factors: 7, glass: 6,
+    # analcatdata_authorship: 1, collins: 0) and a second pass over harder
+    # candidates (splice: 19, wall-robot-navigation: 3, har: 9,
+    # mfeat-pixel: 6, texture/40499: 13 -- consistent with this file's prior
+    # texture/9 rejection) mostly reproduced the same near-perfect-accuracy
+    # failure mode. Three candidates cleared the bar outright:
+    "cmc": dict(
+        dataset_id=23,  # 1473 x 9, K=3, base acc 0.557 -> 98 test errors
+        target_column="Contraceptive_method_used",
+        subgroup_cols=[],
+    ),
+    "waveform_5000": dict(
+        dataset_id=60,  # 5000 x 40, K=3, base acc 0.845 -> 116 test errors
+        target_column="class",
+        subgroup_cols=[],
+    ),
+    "first_order_theorem_proving": dict(
+        dataset_id=1475,  # 6118 x 51, K=6, base acc 0.620 -> 349 test errors
+        target_column="Class",
+        subgroup_cols=[],
+    ),
     # --- Extra Datasets for Friedman Test Statistical Power ---
     # Added to guarantee >= 12 datasets for the Friedman test rank analysis
     "phoneme": dict(
