@@ -12,6 +12,27 @@ the single long-format file every table/figure in the paper queries
 """
 from __future__ import annotations
 
+import os
+
+# --- macOS OpenMP deadlock guard -------------------------------------------
+# LightGBM and PyTorch each bundle their own copy of libomp on macOS wheels.
+# Importing both in one process (this script does, via src/aggregators/
+# a1_stacking.py and a2_coverage_loss.py) makes two OpenMP runtimes try to
+# initialize in the same process. On macOS this does not raise -- it hangs
+# forever with 0% CPU, every worker thread parked in `__kmp_fork_barrier`,
+# and no error message, which is the worst possible failure mode for a
+# project whose whole design point is "reproducible from the CLI" (§8).
+# Verified by reproducing the hang twice (this script and `pytest`) and
+# confirming both resolve immediately once these are set. `n_jobs=-1` in
+# `src/signals/tier_c.py`'s NearestNeighbors calls likely compounds it by
+# adding a third parallel runtime into the same process, though the two
+# reproductions above both import torch + lightgbm together regardless of
+# whether Tier C's kNN path runs, so that pairing is the primary suspect.
+# Must be set before numpy/sklearn/lightgbm/torch are imported anywhere in
+# the process, so this sits above every other import in the entry point.
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+
 import argparse
 import sys
 import warnings

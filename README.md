@@ -176,6 +176,19 @@ All datasets are pulled from **OpenML** by numeric ID — not hand-assembled, no
 !python scripts/make_tables.py --tiers "AC"
 ```
 
+### Running locally on macOS
+
+`scripts/run_all.py` and `pytest` both import LightGBM and PyTorch in the
+same process. On macOS, both ship their own bundled `libomp`, and loading
+both into one process makes the two OpenMP runtimes deadlock instead of
+raising: the process hangs forever at 0% CPU with no error message. Both
+entry points now set `KMP_DUPLICATE_LIB_OK=TRUE` / `OMP_NUM_THREADS=1`
+automatically before any other import, so this should not surface in
+normal use; it's called out here in case a *new* entry point is added that
+imports these libraries without going through `scripts/run_all.py` or
+`tests/conftest.py`, which is the only way the deadlock can reappear.
+Linux/Colab/Kaggle runners are unaffected.
+
 ---
 
 ## 📂 Repository Structure
